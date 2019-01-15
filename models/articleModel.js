@@ -6,7 +6,8 @@ var schema = new mongoose.Schema({
   tags: Array,
   readCount: Number,
   abstract: String,
-  content: String
+  content: String,
+  mdContent: String
 });
 
 module.exports = mongoose.model('Article', schema);
