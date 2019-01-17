@@ -20,6 +20,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(function (req, res, next) {
+  if (req.cookies.userId) {
+    next();
+  } else {
+    console.log("url:"+req.originalUrl);
+    next();
+  }
+})
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/articles', articlesRouter);
