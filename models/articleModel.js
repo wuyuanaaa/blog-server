@@ -9,7 +9,7 @@ var schema = new mongoose.Schema({
   abstract: String,
   content: String,
   mdContent: String,
-  status: Number
+  type: Number
 });
 
 module.exports = mongoose.model('Article', schema);
