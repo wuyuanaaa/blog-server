@@ -25,27 +25,26 @@ router.get('/list', function(req, res) {
       res.json(err)
     } else {
       total = count;
-    }
-  });
-  let articlesModel = Articles.find(params).skip(skip).limit(pageSize);
-
-  articlesModel.exec(function (err, doc) {
-    if (err) {
-      console.log(err);
-      res.json({
-        status: '1',
-        msg: err.message
-      });
-    } else {
-      res.json({
-        status: '0',
-        msg: '',
-        result: {
-          total: total,
-          count: doc.length,
-          list: doc
+      let articlesModel = Articles.find(params,{title:true,tags:true,date:true,abstract:true,readCount:true,type:true}).sort({date:-1}).skip(skip).limit(pageSize);
+      articlesModel.exec(function (err, doc) {
+        if (err) {
+          console.log(err);
+          res.json({
+            status: '1',
+            msg: err.message
+          });
+        } else {
+          res.json({
+            status: '0',
+            msg: '',
+            result: {
+              total: total,
+              count: doc.length,
+              list: doc
+            }
+          })
         }
-      })
+      });
     }
   });
 
@@ -125,7 +124,7 @@ router.post('/remove', function (req, res) {
       })
     }
   })
-})
+});
 
 
 module.exports = router;
