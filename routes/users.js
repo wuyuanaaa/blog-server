@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 var User = require('./../models/userModel');
 
 // 链接数据库
-mongoose.connect('mongodb://blogAdmin:920602@127.0.0.1:27017/blog',{useNewUrlParser:true},function (err) {
+mongoose.connect('mongodb://blogAdmin:blog920602@127.0.0.1:27017/blog',{useNewUrlParser:true},function (err) {
   if(err){
     console.log('Connection Error:' + err)
   }else{
@@ -19,7 +19,17 @@ router.get('/', function(req, res, next) {
 
 // 检查登录状态
 router.get('/checkLogin', function (req, res, next) {
-  if (req.cookies.userId) {
+  if (req.cookies.userName) {
+    let userCookies = req.cookies;
+    // 有操作则延长 cookie 时间
+    res.cookie("type", userCookies.type, {
+      path: '/',
+      maxAge: 1000*60*30
+    });
+    res.cookie("userName", userCookies.userName, {
+      path: '/',
+      maxAge: 1000*60*30
+    });
     res.json({
       status: '0',
       msg: '',
@@ -29,7 +39,7 @@ router.get('/checkLogin', function (req, res, next) {
     })
   } else {
     res.json({
-      status: '1',
+      status: '2',
       msg: '未登录',
       result: ''
     });
@@ -50,19 +60,20 @@ router.post('/login', function (req, res, next) {
       });
     } else {
       if (doc) {
-        res.cookie("userId", doc.userId, {
+        res.cookie("type", doc.type, {
           path: '/',
-          maxAge: 1000*60*60
+          maxAge: 1000*60*30
         });
         res.cookie("userName", doc.userName, {
           path: '/',
-          maxAge: 1000*60*60
+          maxAge: 1000*60*30
         });
         res.json({
           status: '0',
           msg: '',
           result: {
-            userName: doc.userName
+            userName: doc.userName,
+            type: doc.type
           }
         });
       } else {
@@ -76,16 +87,20 @@ router.post('/login', function (req, res, next) {
 });
 
 router.post('/logout', function (req, res, next) {
-  res.cookie("userId", "", {
+  res.cookie("userName", "", {
     path: '/',
-    maxAge: -1
+    maxAge: 0
+  });
+  res.cookie("type", "", {
+    path: '/',
+    maxAge: 0
   });
   res.json({
     status: '0',
     msg: '',
     result: ''
   })
-})
+});
 
 
 module.exports = router;

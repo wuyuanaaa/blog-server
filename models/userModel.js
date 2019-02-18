@@ -4,7 +4,7 @@ var schema = new mongoose.Schema({
   "userId":String,
   "userName":String,
   "userPwd":String,
-  "permissions":Number
+  "type":String
 });
 
 

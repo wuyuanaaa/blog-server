@@ -3,7 +3,7 @@ var router = express.Router();
 var Articles = require('../models/articleModel');
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://blogAdmin:920602@127.0.0.1:27017/blog',{useNewUrlParser:true},function (err) {
+mongoose.connect('mongodb://blogAdmin:blog920602@127.0.0.1:27017/blog',{useNewUrlParser:true},function (err) {
   if(err){
     console.log('Connection Error:' + err)
   }else{
@@ -25,7 +25,7 @@ router.get('/list', function(req, res) {
       res.json(err)
     } else {
       total = count;
-      let articlesModel = Articles.find(params,{title:true,tags:true,date:true,abstract:true,readCount:true,type:true}).sort({date:-1}).skip(skip).limit(pageSize);
+      let articlesModel = Articles.find(params,{title:true,tags:true,date:true,lastDate: true,abstract:true,readCount:true,type:true}).sort({date:-1}).skip(skip).limit(pageSize);
       articlesModel.exec(function (err, doc) {
         if (err) {
           console.log(err);
@@ -67,6 +67,30 @@ router.get('/single', function(req, res) {
       console.log(err);
     }
   })
+});
+
+// 获取标签所有文章
+router.get('/tag', function(req, res) {
+  let tagModel = Articles.find({tags: req.query.tag},{title:true,date:true}).sort({date:-1});
+
+  tagModel.exec(function (err, doc) {
+    if (err) {
+      console.log(err);
+      res.json({
+        status: '1',
+        msg: err.message
+      });
+    } else {
+      res.json({
+        status: '0',
+        msg: '',
+        result: {
+          list: doc
+        }
+      })
+    }
+  });
+
 });
 
 
