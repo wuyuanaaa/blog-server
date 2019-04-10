@@ -53,21 +53,49 @@ router.get('/list', function(req, res) {
 
 // 获取单篇文章
 router.get('/single', function(req, res) {
-  var count;
   Articles.find({_id: req.query._id},function (err, doc) {
     if (err) {
       console.log(err);
       return;
     }
-    count = doc.readCount + 1;
     res.json(doc)
   });
+
   Articles.update({_id: req.query._id},{$inc:{readCount: 1}},function (err, doc) {
     if (err) {
       console.log(err);
     }
   })
 });
+
+// 获取上一篇
+router.get('/prev', function (req, res) {
+  let prev = Articles.find({date: {$lt: req.query.date}, type: {$ne:1}},{title: true, _id:true}).sort({date:-1}).limit(1);
+
+  prev.exec(function (err, doc) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    res.json(doc);
+  });
+
+});
+
+// 获取下一篇
+router.get('/next', function (req, res) {
+  let next = Articles.find({date: {$gt: req.query.date}, type: {$ne:1}},{title: true, _id:true}).limit(1);
+
+  next.exec(function (err, doc) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    res.json(doc);
+  });
+});
+
+
 
 // 获取标签所有文章
 router.get('/tag', function(req, res) {
