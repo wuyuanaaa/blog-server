@@ -10,6 +10,39 @@ mongoose.connect('mongodb://blogAdmin:blog920602@127.0.0.1:27017/blog',{useNewUr
     console.log('Connection success!') }
 });
 
+// 验证权限
+function check (req, res, next) {
+  if (req.cookies.userName) {
+    let userCookies = req.cookies;
+    // 有操作则延长 cookie 时间
+    res.cookie("type", userCookies.type, {
+      path: '/',
+      maxAge: 1000*60*30
+    });
+    res.cookie("userName", userCookies.userName, {
+      path: '/',
+      maxAge: 1000*60*30
+    });
+
+    if(parseInt(userCookies.type) !== 823) {
+      res.json({
+        status: '3',
+        msg: '没有该权限！',
+        result: ''
+      });
+    } else {
+      next();
+    }
+  } else {
+    res.json({
+      status: '2',
+      msg: '未登录',
+      result: ''
+    });
+  }
+}
+
+
 /* 获取文章列表 */
 router.get('/list', function(req, res) {
   let page = parseInt(req.query.page);
@@ -137,7 +170,8 @@ router.post('/save', function (req, res) {
 
 // 修改文章
 router.post('/change', function (req, res) {
-  let _id = req.body._id;
+  check(req, res, () => {
+    let _id = req.body._id;
   let newData = req.body.newData;
 
   Articles.update({_id: _id},{$set:newData},function (err, doc) {
@@ -156,10 +190,12 @@ router.post('/change', function (req, res) {
     }
   })
 });
+});
 
 // 删除文章
 router.post('/remove', function (req, res) {
-  let _id = req.body._id;
+  check(req, res, () => {
+    let _id = req.body._id;
 
   Articles.remove({_id: _id}, function (err) {
     if (err) {
@@ -176,6 +212,7 @@ router.post('/remove', function (req, res) {
       })
     }
   })
+});
 });
 
 
