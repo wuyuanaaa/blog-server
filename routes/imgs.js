@@ -118,6 +118,6 @@ router.post('/remove', function (req, res) {
       }
     })
   })
-})
+});
 
 module.exports = router;

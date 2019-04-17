@@ -29,7 +29,7 @@ app.use(function (req, res, next) {
     console.log("url:"+req.originalUrl);
     next();
   }
-})
+});
 
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);

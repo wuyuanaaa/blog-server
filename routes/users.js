@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var request = require('request');
 
 var User = require('./../models/userModel');
 
@@ -46,6 +47,7 @@ router.get('/checkLogin', function (req, res, next) {
   }
 });
 
+// 用户登陆
 router.post('/login', function (req, res, next) {
   var param = {$and:[
       {userName: req.body.userName},
@@ -86,6 +88,7 @@ router.post('/login', function (req, res, next) {
   })
 });
 
+// 用户登出
 router.post('/logout', function (req, res, next) {
   res.cookie("userName", "", {
     path: '/',
@@ -99,6 +102,26 @@ router.post('/logout', function (req, res, next) {
     status: '0',
     msg: '',
     result: ''
+  })
+});
+
+// github 登陆回调
+router.get('/github', function (req, res, next) {
+  let code = req.query.code;
+  let url = "https://github.com/login/oauth/access_token?client_id=5c971effe02228b9a039&client_secret=57208a6138b5d49a070d457543a94c69ea3e4bf6&code=" + code;
+  request(url, function (error, response, body) {
+    let tokenUrl = 'https://api.github.com/user?'+ body;
+    request({
+      url: tokenUrl,
+      headers: {
+        'User-Agent': 'http://developer.github.com/v3/#user-agent-required'
+      }
+    }, function (error, response, body) {
+      res.json({
+        status: '0',
+        result: JSON.parse(body)
+      })
+    })
   })
 });
 
