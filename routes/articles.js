@@ -143,7 +143,7 @@ router.get('/next', function (req, res) {
 
 // 获取标签所有文章
 router.get('/tag', function (req, res) {
-  let tagModel = Articles.find({tags: req.query.tag}, {title: true, date: true}).sort({date: -1});
+  let tagModel = Articles.find({tags: req.query.tag, type: {$ne: 1}}, {title: true, date: true}).sort({date: -1});
 
   tagModel.exec(function (err, doc) {
     if (err) {
