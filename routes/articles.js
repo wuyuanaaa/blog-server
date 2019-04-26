@@ -95,17 +95,17 @@ router.get('/list', function (req, res) {
 
 // 获取单篇文章
 router.get('/single', function (req, res) {
-  Articles.find({_id: req.query._id}, function (err, doc) {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    res.json(doc)
-  });
-
   Articles.update({_id: req.query._id}, {$inc: {readCount: 1}}, function (err, doc) {
     if (err) {
       console.log(err);
+    } else {
+      Articles.find({_id: req.query._id}, function (err, doc) {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        res.json(doc)
+      });
     }
   })
 });
