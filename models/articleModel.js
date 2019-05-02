@@ -9,7 +9,14 @@ var schema = new mongoose.Schema({
   abstract: String,
   content: String,
   mdContent: String,
-  type: Number
+  type: Number,
+  catalog: [
+    {
+      lev: Number,
+      text: String,
+      id: String
+    }
+  ]
 });
 
 module.exports = mongoose.model('Article', schema);
