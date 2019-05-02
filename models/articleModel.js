@@ -6,6 +6,10 @@ var schema = new mongoose.Schema({
   lastDate: Number,
   tags: Array,
   readCount: Number,
+  commentCount: {
+    type: Number,
+    default: 0
+  },
   abstract: String,
   content: String,
   mdContent: String,

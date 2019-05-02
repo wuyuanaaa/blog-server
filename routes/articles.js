@@ -66,6 +66,7 @@ router.get('/list', function (req, res) {
         lastDate: true,
         abstract: true,
         readCount: true,
+        commentCount: true,
         type: true
       }).sort({date: -1}).skip(skip).limit(pageSize);
       articlesModel.exec(function (err, doc) {

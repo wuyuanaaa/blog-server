@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Comments = require('../models/commentModel');
+var Articles = require('../models/articleModel');
 var mongoose = require('mongoose');
 
 mongoose.connect('mongodb://blogAdmin:blog920602@127.0.0.1:27017/blog',{useNewUrlParser:true},function (err) {
@@ -51,6 +52,13 @@ router.post('/save_comment', function (req, res) {
     }
     res.send({
       status: '0'
+    });
+    // 更新对应文章评论数
+    let _id = req.body.article_id;
+    Articles.update({_id: _id},{$inc: {commentCount: 1}}, function (err, doc) {
+      if (err) {
+        console.log(err);
+      }
     })
   })
 });
@@ -66,6 +74,20 @@ router.post('/save_follow_comment', function (req, res) {
     } else {
       res.json({
         status: '0'
+      });
+      // 找到对应文章 _id
+      Comments.findOne({_id: req.body.follow_id}, function (err, doc) {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        let _id = doc.article_id;
+        // 更新评论数
+        Articles.update({_id: _id},{$inc: {commentCount: 1}}, function (err, doc) {
+          if (err) {
+            console.log(err);
+          }
+        })
       })
     }
   })
@@ -76,19 +98,37 @@ router.post('/remove_comment', function (req, res) {
   check(req, res, () => {
     let _id = req.body._id;
 
-    Comments.remove({_id: _id}, function (err) {
+    // 找到评论
+    Comments.findOne({_id: _id}, function (err, doc) {
       if (err) {
-        res.json({
-          status: '1',
-          msg: err.message,
-          result: ''
-        })
-      } else {
-        res.json({
-          status: '0'
-        })
+        console.log(err);
+        return;
       }
-    })
+      let totalComment = doc.comment_follow.length + 1;
+      let article_id = doc.article_id;
+      // 删除评论
+      Comments.remove({_id: _id}, function (err) {
+        if (err) {
+          res.json({
+            status: '1',
+            msg: err.message,
+            result: ''
+          })
+        } else {
+          res.json({
+            status: '0'
+          });
+          // 更新评论数
+          Articles.update({_id: article_id},{$inc: {commentCount: -totalComment}}, function (err, doc) {
+            if (err) {
+              console.log(err);
+            }
+          })
+        }
+      });
+
+    });
+
   });
 });
 
@@ -108,6 +148,20 @@ router.post('/remove_follow_comment', function (req, res) {
       } else {
         res.json({
           status: '0'
+        });
+        // 找到对应文章 _id
+        Comments.findOne({_id: top_id}, function (err, doc) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          let _id = doc.article_id;
+          // 更新评论数
+          Articles.update({_id: _id},{$inc: {commentCount: -2}}, function (err, doc) {
+            if (err) {
+              console.log(err);
+            }
+          })
         })
       }
     })
