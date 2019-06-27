@@ -25,14 +25,14 @@ function check(req, res, next) {
       maxAge: 1000 * 60 * 30
     });
 
-    if (parseInt(userCookies.type) !== 823) {
+    if (parseInt(userCookies.type) === 823) {
+      next();
+    } else {
       res.json({
         status: '3',
         msg: '没有该权限！',
         result: ''
       });
-    } else {
-      next();
     }
   } else {
     res.json({
@@ -93,7 +93,6 @@ router.get('/list', function (req, res) {
 
 });
 
-
 // 获取单篇文章
 router.get('/single', function (req, res) {
   Articles.update({_id: req.query._id}, {$inc: {readCount: 1}}, function (err, doc) {
@@ -141,7 +140,6 @@ router.get('/next', function (req, res) {
   });
 });
 
-
 // 获取标签所有文章
 router.get('/tag', function (req, res) {
   let tagModel = Articles.find({tags: req.query.tag, type: {$ne: 1}}, {title: true, date: true}).sort({date: -1});
@@ -166,17 +164,18 @@ router.get('/tag', function (req, res) {
 
 });
 
-
 // 添加文章
 router.post('/save', function (req, res) {
-  new Articles(req.body).save(function (err) {
-    if (err) {
-      res.status(500).send();
-      return
-    }
-    res.send({
-      status: '0'
-    });
+  check(req, res, () => {
+    new Articles(req.body).save(function (err) {
+      if (err) {
+        res.status(500).send();
+        return
+      }
+      res.send({
+        status: '0'
+      });
+    })
   })
 });
 
